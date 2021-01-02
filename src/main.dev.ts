@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, BrowserView } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -68,13 +68,15 @@ const createWindow = async () => {
   };
 
   mainWindow = new BrowserWindow({
+    center : true,
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1200,
+    height: 900,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      webSecurity: false 
     },
   });
 
