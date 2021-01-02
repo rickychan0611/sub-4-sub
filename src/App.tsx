@@ -2,10 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { remote } from 'electron'
 import ContextProvider from "./context/Context"
-
 import Home from "./pages/Home";
 import View from "./pages/View";
 import Register from "./pages/Register";
+
 
 export default function App() {
   return (

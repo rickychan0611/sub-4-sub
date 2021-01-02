@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import bgImg from '../../assets/mainbg.jpg'
 import { useHistory, Link } from "react-router-dom";
 
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import Box from '@material-ui/core/Box';
@@ -77,20 +75,8 @@ const Home = () => {
     validate.catch((error) => {
       setLoading(false)
       console.log(error)
-      // setErr(prev => ({ ...prev, email: error }))
-      // history.push("/view");
     })
   }
-
-  // const body = (
-  //   <div style={modalStyle} className={classes.paper}>
-  //     <h2 id="simple-modal-title">Message</h2>
-  //     <p id="simple-modal-description">
-  //       {admin.message}
-  //     </p>
-  //     <SimpleModal />
-  //   </div>
-  // );
 
   return (
 
@@ -101,14 +87,6 @@ const Home = () => {
       alignItems="center"
       style={{ padding: 50 }}
     >
-      {/* <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="simple-modal-title"
-        aria-describedby="simple-modal-description"
-      >
-        {body}
-      </Modal> */}
 
       <Paper elevation={3} style={{ paddingBottom: 50, paddingRight: 60, marginBottom: 20, maxWidth: 800 }}>
         <Box>

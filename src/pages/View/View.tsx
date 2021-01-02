@@ -20,7 +20,11 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Icon from '@material-ui/core/Icon';
 import { Divider } from '@material-ui/core';
+import { remote } from 'electron'
 
+require('events').EventEmitter.defaultMaxListeners = 20;
+
+const win = remote.getCurrentWindow()
 const delay = require('delay');
 
 const preload = resolve('../../preload.js')
@@ -51,6 +55,7 @@ const View = () => {
   const [youtubeLogedIn, setYoutubeLogedIn] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const [urlToPlay, setUrlToPlay] = useState("https://www.youtube.com/")
+  const [ready, setReady] = useState(false)
 
   const switchURL = () => {
     setAttached(false)
@@ -85,7 +90,10 @@ const View = () => {
   }
 
   useEffect(() => {
-    setUser(prev => prev)
+    setTimeout(()=>{
+      setReady(true)
+    },2000)
+    return ()=>{setReady(false)}
   }, [user])
   ///<---------auto task--------->///
 
@@ -144,28 +152,6 @@ const View = () => {
     playedUsers = playedUsers && Object.values(playedUsers)
 
     console.log("playedUsers", playedUsers)
-
-    // let filteredUsers = []
-    // if (playedUsers && playedUsers[0]) {
-
-    //   online
-
-    //   // let tempArr
-    //   // onlineUsers.map(onlineUser=>{
-    //   //   console.log("On ",onlineUser.uid)
-    //   //   playedUsers.map(playedUser=>{
-    //   //     console.log("PL ", playedUser.uid)
-    //   //     if
-    //   //   })
-    //   // })
-
-
-    //   filteredUsers = onlineUsers.filter(onlineUser => !playedUsers.includes((user)=>user.uid === onlineUser.uid))
-    //   console.log("filteredUsers", filteredUsers)
-    // }
-    // else {
-    //   // filteredUsers = onlineUsers
-    // }
 
     let random = 0;
     let check = true
@@ -228,27 +214,6 @@ const View = () => {
     }
   }, [attached])
 
-  // const getFilteredUsers = () => {
-  //   console.log("playedUsers", playedUsers)
-  //   setFilteredUsers([])
-  //   let tempArr = []
-  //   let onlineUids = []
-  //   if (playedUsers[0] && onlineUsers[0]) {
-  //     tempArr = onlineUsers.filter(onlineUser => !playedUsers.includes(onlineUser.uid));
-  //     console.log(tempArr)
-  //     setFilteredUsers(tempArr)
-  //   }
-  //   else if (!playedUsers[0]) {
-  //     setFilteredUsers(onlineUsers)
-  //   }
-  //   console.log("filteredUsers", filteredUsers)
-  // }
-
-  // useEffect(() => {
-  //   getFilteredUsers()
-  // }, [onlineUsers])
-
-
   let myviews;
   // stop all played
   useEffect(() => {
@@ -289,27 +254,17 @@ const View = () => {
 
   return (
 
-    <div style={{ margin: 50 }}>
+    <div style={{ padding: 50, paddingTop: 0, overflow: "auto" }}>
       {/* {JSON.stringify(filteredUsers.map(item => item.uid))}<br /> */}
-      {/* <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
+      <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
       <Button variant="contained" color="primary" onClick={() => switchURL()}>Switch URL</Button><br />
 
-      <Button variant="contained" color="primary" onClick={() => setToggleView(!toggleView)}>tdoggleView</Button><br /> */}
+      <Button variant="contained" color="primary" onClick={() => setToggleView(!toggleView)}>tdoggleView</Button><br />
 
-      <Box display="flex" justifyContent="flex-end">
-        <Button style={{ margin: 8 }} variant="contained" color="primary"
-          onClick={() => {
-            auth.signOut().then(function () {
-              // Sign-out successful.
-              history.push('/')
-            }).catch(function (error) {
-              // An error happened.
-            });
-          }}>Sign Out</Button><br />
-      </Box>
+      
       <div style={{ marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 30, fontWeight: "bold" }} >
 
-        <Box style={{ color: "grey", marginBottom: 40 }}>
+        <Box style={{ color: "grey", marginBottom: 20 }}>
           <span style={{ fontSize: 20, }}>You've got
         <span style={{ fontSize: 24, color: "#f75a4f" }}> {user.views} </span>
         subscribers and counting!</span>
@@ -335,9 +290,9 @@ const View = () => {
             }}
           >
             Start
-               </Button>
-        </Box>
-              </>
+          </Button>
+          </Box>
+        </>
                 :
       <>
         <Box style={{ color: "grey" }}>
@@ -350,24 +305,24 @@ const View = () => {
             onClick={() => { stopPlaying() }}
           >
             Stop
-                  </Button>
+           </Button>
         </Box>
       </>
               }
             </>
             :
-<>
-  {
-    // FREE Version
-    // !user.views > (admin.v0_1_0 ? admin.v0_1_0.maxViews : 0) &&
-    <div>
-      Please login to your youtube account below <br />
-      <div style={{ color: "grey" }}>
-        Waiting...
+        <>
+          {
+            // FREE Version
+            // !user.views > (admin.v0_1_0 ? admin.v0_1_0.maxViews : 0) &&
+            <div>
+              Please login to your youtube account below <br />
+              <div style={{ color: "grey" }}>
+                Waiting...
+                    </div>
             </div>
-    </div>
-  }
-</>
+          }
+        </>
           }
 
         </>
@@ -383,7 +338,7 @@ const View = () => {
     <Grid item xs={10}
     >
       <Paper elevation={3} style={{
-        minHeight: 600, padding: 30, paddingRight: 60, marginBottom: 20,
+        minHeight: 550, margin: 10, marginTop: 0, paddingTop: 30, padding: 15, marginBottom: 20,
       }}>
 
         {/* //FREE */}
@@ -406,9 +361,9 @@ const View = () => {
                   </span>
           </div> :
           <>
-            {toggleView &&
+            {toggleView && win &&
               <BrowserView
-                src={attached? urlToPlay: ""}
+                src={urlToPlay ? urlToPlay : "https://www.youtube.com"}
                 className="browser"
                 preload={preload}
                 // Keep instance reference so we can execute methods
@@ -429,7 +384,7 @@ const View = () => {
                   // console.log("Updated url");
                 }}
                 style={{
-                  height: 600, width: 800
+                  height: 550,
                 }}
                 disablewebsecurity={true}
               />
@@ -439,7 +394,7 @@ const View = () => {
     </Grid>
 
     <Grid item xs={2}>
-      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, minHeight: 690, }}>
+      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, marginRight: 10, minHeight: 520, }}>
         <h4 style={{ textAlign: "center" }}>
           Online Buddies({onlineUsers.length})
               <div style={{ fontSize: 12, marginTop: 10 }}>
@@ -458,8 +413,18 @@ const View = () => {
           })}
         </List>
       </Paper>
+    <Box display="flex" justifyContent="flex-end">
+        <Button style={{ margin: 8 }} variant="contained" color="primary"
+          onClick={() => {
+            auth.signOut().then(function () {
+              // Sign-out successful.
+              history.push('/')
+            }).catch(function (error) {
+              // An error happened.
+            });
+          }}>Sign Out</Button><br />
+      </Box>
     </Grid>
-
   </Grid>
     </div >
   )
