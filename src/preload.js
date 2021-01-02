@@ -1,7 +1,9 @@
-// Simply preload script used in one of the example webviews
+const { contextBridge } = require("electron");
+var ipcRenderer = require('electron').ipcRenderer;
+console.log("PRELOADED!!!!")
 let youtubeAvatar;
 let button;
-var ipcRenderer = require('electron').ipcRenderer;
+
 require('events').EventEmitter.defaultMaxListeners = Infinity;
 
 window.onload = () => {

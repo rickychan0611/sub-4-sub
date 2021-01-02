@@ -27,7 +27,9 @@ require('events').EventEmitter.defaultMaxListeners = 20;
 const win = remote.getCurrentWindow()
 const delay = require('delay');
 
-const preload = resolve('../../preload.js')
+const path = require("path");
+const preload = path.join(__dirname, "preload.js")
+console.log(preload)
 
 var ipcMain = require("electron").remote.ipcMain;
 const { shell } = require('electron');
@@ -160,20 +162,29 @@ const View = () => {
     await new Promise((resolve, reject) => { 
 
       while (i <= onlineUsers.length && check === true) { 
-        random = Math.floor(Math.random() * (onlineUsers.length))
-        if (!playedUsers){
+        console.log(i <= onlineUsers.length, check === true)
+        random = Math.floor(Math.random() * (onlineUsers.length)) //get a random number
+
+        if (!playedUsers){ //have not watched anyone's video, play any video
           check = false
           resolve()
+          return
         }
 
-        else if (onlineUsers[random].uid !== user.uid) { //is it urself?
+        else if (onlineUsers[random].uid !== user.uid) { //random is not me
+
           let arr = playedUsers.map(user => { //find the id
             if (user.uid === onlineUsers[random].uid) {
-              return 1 
+              return 1  //put 1 in the arry, otherwise undefined. 
             }
           })
-          check = arr.includes(1) //can't found it, loop break, id ok
-          i++
+          check = arr.includes(1) //check any "1" in arry, if can't found it, check == false, otherwise continue to loop for another random number
+          i++ 
+        }
+        else {
+          console.log("only me online")
+          resolve()
+          check = false //break the loop
         }  
       }
       resolve()
@@ -256,10 +267,10 @@ const View = () => {
 
     <div style={{ padding: 50, paddingTop: 0, overflow: "auto" }}>
       {/* {JSON.stringify(filteredUsers.map(item => item.uid))}<br /> */}
-      <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
+      {/* <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
       <Button variant="contained" color="primary" onClick={() => switchURL()}>Switch URL</Button><br />
 
-      <Button variant="contained" color="primary" onClick={() => setToggleView(!toggleView)}>tdoggleView</Button><br />
+      <Button variant="contained" color="primary" onClick={() => setToggleView(!toggleView)}>tdoggleView</Button><br /> */}
 
       
       <div style={{ marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 30, fontWeight: "bold" }} >
@@ -387,6 +398,7 @@ const View = () => {
                   height: 550,
                 }}
                 disablewebsecurity={true}
+                contextIsolation={false}
               />
             }
           </>}
