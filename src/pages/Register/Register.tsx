@@ -185,6 +185,7 @@ const Register = () => {
           </div>
         </form>
         <Box display="flex" justifyContent="flex-end">
+          <Button startIcon={loading && <CircularProgress color="inherit" size={14} />} style={{ margin: 8 }} variant="contained" color="grey" onClick={() => history.push('/')}>Back</Button><br />
           <Button startIcon={loading && <CircularProgress color="inherit" size={14} />} style={{ margin: 8 }} variant="contained" color="primary" onClick={() => onSubmit()}>Submit</Button><br />
         </Box>
       </Paper>

@@ -442,7 +442,7 @@ const View = () => {
           onClick={() => {
             auth.signOut().then(function () {
               // Sign-out successful.
-              history.push('/')
+              history.push('/home')
             }).catch(function (error) {
               // An error happened.
             });
