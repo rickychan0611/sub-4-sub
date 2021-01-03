@@ -26,7 +26,6 @@ import { remote } from 'electron'
 
 require('events').EventEmitter.defaultMaxListeners = 20;
 
-const VIDEO_DURATION = 60000 * 4
 
 const win = remote.getCurrentWindow()
 const delay = require('delay');
@@ -96,6 +95,9 @@ const View = () => {
 
 
   const autoWatch = (userToWatch) => {
+
+    const VIDEO_DURATION = 6000 * Math.floor(Math.random() * (55 - 25) + 25)
+
     console.log("autoWatch now, run promise")
     console.log(userToWatch)
     return new Promise(async (resolve, reject) => {
