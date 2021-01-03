@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react'
-import BrowserView from 'react-electron-browser-view';
+import removeViews from '../../removeViews'
+import ElectronBrowserView from '../../ElectronBrowserView';
 import SetInterval from 'set-interval'
 import firebase from 'firebase/app'
 import { useHistory } from "react-router-dom";
@@ -24,6 +25,8 @@ import { remote } from 'electron'
 
 require('events').EventEmitter.defaultMaxListeners = 20;
 
+const VIDEO_DURATION = 60000 * 4
+
 const win = remote.getCurrentWindow()
 const delay = require('delay');
 let preload =""
@@ -47,16 +50,8 @@ let view;
 // URL we want to toggle between
 const View = () => {
   let history = useHistory();
-  const { user, setUser, onlineUsers, admin } = useContext(Context)
+  const { user, onlineUsers, admin } = useContext(Context)
 
-  const urls = [
-    'https://www.youtube.com/channel/UCpqk_tJt2AvGcQm22oQwdtQ?sub_confirmation=1',
-    'https://www.youtube.com/channel/UCOmHUn--16B90oW2L6FRR3A?sub_confirmation=1'
-  ]
-
-  const [url, setUrl] = useState(0)
-
-  // const [filteredUsers, setFilteredUsers] = useState([])
   const [stop, setStop] = useState(true)
   const [subing, setSubing] = useState(false)
   const [counter, setCounter] = useState(0)
@@ -68,16 +63,6 @@ const View = () => {
   const [urlToPlay, setUrlToPlay] = useState("https://www.youtube.com/")
   const [ready, setReady] = useState(false)
 
-  const switchURL = () => {
-    setAttached(false)
-    setUrl(prev => {
-      if (prev + 1 >= urls.length) {
-        return 0
-      } else {
-        return prev + 1
-      }
-    })
-  }
 
   ipcMain.on('youtubelogin', function (event, value) {
     if (value === "youtubeLogedIn") {
@@ -114,7 +99,7 @@ const View = () => {
     console.log(userToWatch)
     return new Promise(async (resolve, reject) => {
       setSubscribed(false)
-      setCounter(5000)
+      setCounter(VIDEO_DURATION)
       setSubing(false)
 
       SetInterval.start(stopWatch, 1000, 'stopWatch')
@@ -124,7 +109,7 @@ const View = () => {
 
       db.ref('users/' + user.uid + '/played/' + userToWatch.uid).update({ uid: userToWatch.uid })
       setUrlToPlay(userToWatch.videoUrl1) //play video
-      await delay(5000) // video play time TODO. set 4mins
+      await delay(VIDEO_DURATION) // video play time TODO. set 4mins
 
       setUrlToPlay(userToWatch.channelUrl) //subscribe channel
       if (userToWatch.uid !== user.uid) {
@@ -157,7 +142,33 @@ const View = () => {
 
     let onlineUsers = await db.ref('onlineUsers/').once('value').then((snapshot) => snapshot.val())
     onlineUsers = onlineUsers && Object.values(onlineUsers)
-    console.log("onlineUsers", onlineUsers)
+    //add onlineusers depends on level
+
+    let tempArr = []
+
+    onlineUsers[0] && onlineUsers.map((user)=>{
+      if (user.level === 1) {
+        for (let i = 0; i < 2; i++){
+          tempArr.push(user)
+        }
+      }
+      else if (user.level === 2) {
+        for (let i = 0; i < 10; i++){
+          tempArr.push(user)
+        }
+      }
+      else if (user.level === 3) {
+        for (let i = 0; i < 50; i++){
+          tempArr.push(user)
+        }
+      }
+      else {
+        return
+      }
+      onlineUsers = [...onlineUsers, ...tempArr]
+    })
+
+ console.log("onlineUsers", onlineUsers)
 
     let playedUsers = await db.ref('users/' + user.uid + "/played").once('value').then((snapshot) => snapshot.val())
     playedUsers = playedUsers && Object.values(playedUsers)
@@ -207,24 +218,16 @@ const View = () => {
       console.log("watching a NEW video")
     }
 
-
-    // console.log("random", random)
-    // console.log("onlineUsers", onlineUsers[random])
-    // console.log("filteredUsers", filteredUsers[random])
-
     if (snapviews < admin.v0_1_0.maxViews) {
-      // console.log("go to autoWatch")
-      // console.log(filteredUsers.length === 1 ? "ONEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE" : "!!!!!!!ONLINE")
-      autoWatch(onlineUsers[random])
+     autoWatch(onlineUsers[random])
         .then(() => { repeatPlaying() })
     }
   }
 
   const stopPlaying = () => {
-    // setStop(true)
-    window.location.reload(false);
+    removeViews()
+    window.location.reload(false)
   }
-
 
   useEffect(() => {
     if (attached) {
@@ -241,8 +244,6 @@ const View = () => {
     console.log("userEffect", user.views)
     myviews = user.views
   }, [user.views])
-
-
 
   const timer = (counter) => {
     return moment.utc(counter).format('mm:ss');
@@ -276,14 +277,11 @@ const View = () => {
   return (
 
     <div style={{ padding: 50, paddingTop: 0, overflow: "auto" }}>
-      {preload}
       {/* {JSON.stringify(filteredUsers.map(item => item.uid))}<br /> */}
       {/* <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
       <Button variant="contained" color="primary" onClick={() => switchURL()}>Switch URL</Button><br />
-
       <Button variant="contained" color="primary" onClick={() => setToggleView(!toggleView)}>tdoggleView</Button><br /> */}
-
-      
+  
       <div style={{ marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 30, fontWeight: "bold" }} >
 
         <Box style={{ color: "grey", marginBottom: 20 }}>
@@ -328,6 +326,7 @@ const View = () => {
           >
             Stop
            </Button>
+           <div style={{fontSize: 14, color: "#349e50"}}>Automation started. Now you can sit back and relex. <br/> You can mute the video, minimize the window and keep it running in the background.</div>
         </Box>
       </>
     }
@@ -360,7 +359,7 @@ const View = () => {
     <Grid item xs={10}
     >
       <Paper elevation={3} style={{
-        minHeight: 550, margin: 10, marginTop: 0, paddingTop: 30, padding: 15, marginBottom: 20,
+        minHeight: 670, margin: 10, marginTop: 0, paddingTop: 35, padding: 15, marginBottom: 20,
       }}>
 
         {/* //FREE */}
@@ -384,7 +383,7 @@ const View = () => {
           </div> :
           <>
             {toggleView && win &&
-              <BrowserView
+              <ElectronBrowserView
                 src={urlToPlay ? urlToPlay : "https://www.youtube.com"}
                 className="browser"
                 preload={preload}
@@ -406,7 +405,7 @@ const View = () => {
                   // console.log("Updated url");
                 }}
                 style={{
-                  height: 550,
+                  height: 650,
                 }}
                 disablewebsecurity={true}
                 contextIsolation={false}
@@ -418,7 +417,7 @@ const View = () => {
     </Grid>
 
     <Grid item xs={2}>
-      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, marginRight: 10, minHeight: 520, }}>
+      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, marginRight: 10, minHeight: 620, }}>
         <h4 style={{ textAlign: "center" }}>
           Online Buddies({onlineUsers.length})
               <div style={{ fontSize: 12, marginTop: 10 }}>
