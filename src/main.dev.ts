@@ -24,7 +24,7 @@ export default class AppUpdater {
   }
 }
 
-let mainWindow: BrowserWindow | null = null;
+let mainWindow: BrowserWindow
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -38,25 +38,25 @@ if (
   require('electron-debug')();
 }
 
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
+// const installExtensions = async () => {
+//   const installer = require('electron-devtools-installer');
+//   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+//   const extensions = ['REACT_DEVELOPER_TOOLS'];
 
-  return installer
-    .default(
-      extensions.map((name) => installer[name]),
-      forceDownload
-    )
-    .catch(console.log);
-};
+//   return installer
+//     .default(
+//       extensions.map((name) => installer[name]),
+//       forceDownload
+//     )
+//     .catch(console.log);
+// };
 
 const createWindow = async () => {
   if (
     process.env.NODE_ENV === 'development' ||
     process.env.DEBUG_PROD === 'true'
   ) {
-    await installExtensions();
+    // await installExtensions();
   }
 
   const RESOURCES_PATH = app.isPackaged
@@ -82,6 +82,7 @@ const createWindow = async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
+  mainWindow.maximize();
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
@@ -98,7 +99,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
-    mainWindow = null;
+    // mainWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
@@ -110,12 +111,17 @@ const createWindow = async () => {
     shell.openExternal(url);
   });
 
+  
+  mainWindow.webContents.on('did-fail-load', () => { 
+    console.log('on browser reload it did-fail-load and reloaded the app')
+    mainWindow.loadURL(`file://${__dirname}/index.html`)
+  });
+
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
-  new AppUpdater();
+  // new AppUpdater();
  
 };
-
 
 /**
  * Add event listeners...
@@ -130,6 +136,7 @@ app.on('window-all-closed', () => {
 });
 
 app.whenReady().then(createWindow).catch(console.log);
+// app.on('ready', createWindow)
 
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the

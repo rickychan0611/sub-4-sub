@@ -26,9 +26,18 @@ require('events').EventEmitter.defaultMaxListeners = 20;
 
 const win = remote.getCurrentWindow()
 const delay = require('delay');
-
+let preload =""
 const path = require("path");
-const preload = path.join(__dirname, "preload.js")
+if (process.env.NODE_ENV === 'production') {
+  let url =  path.join(__dirname)
+  url = url.replace('app.asar','src/preload.js');
+  preload = url
+}
+else {
+  preload = path.join(__dirname, "preload.js")
+
+}
+
 console.log(preload)
 
 var ipcMain = require("electron").remote.ipcMain;
@@ -212,6 +221,7 @@ const View = () => {
   }
 
   const stopPlaying = () => {
+    // setStop(true)
     window.location.reload(false);
   }
 
@@ -266,6 +276,7 @@ const View = () => {
   return (
 
     <div style={{ padding: 50, paddingTop: 0, overflow: "auto" }}>
+      {preload}
       {/* {JSON.stringify(filteredUsers.map(item => item.uid))}<br /> */}
       {/* <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
       <Button variant="contained" color="primary" onClick={() => switchURL()}>Switch URL</Button><br />
@@ -319,7 +330,7 @@ const View = () => {
            </Button>
         </Box>
       </>
-              }
+    }
             </>
             :
         <>
@@ -329,7 +340,7 @@ const View = () => {
             <div>
               Please login to your youtube account below <br />
               <div style={{ color: "grey" }}>
-                Waiting...
+                Waiting for login signal...
                     </div>
             </div>
           }
@@ -399,6 +410,7 @@ const View = () => {
                 }}
                 disablewebsecurity={true}
                 contextIsolation={false}
+                enableRemoteModule={true}
               />
             }
           </>}
