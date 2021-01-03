@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import removeViews from '../../removeViews'
 import ElectronBrowserView from '../../ElectronBrowserView';
+import BrowserView from 'react-electron-browser-view';
 import SetInterval from 'set-interval'
 import firebase from 'firebase/app'
 import { useHistory } from "react-router-dom";
@@ -383,7 +384,7 @@ const View = () => {
           </div> :
           <>
             {toggleView && win &&
-              <ElectronBrowserView
+              <BrowserView
                 src={urlToPlay ? urlToPlay : "https://www.youtube.com"}
                 className="browser"
                 preload={preload}
