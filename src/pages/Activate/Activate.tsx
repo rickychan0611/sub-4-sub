@@ -12,6 +12,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { db } from "../../firebaseApp";
 import { Context } from '../../context/Context';
+const { shell } = require('electron');
 
 // URL we want to toggle between
 const Home = () => {
@@ -102,14 +103,22 @@ const Home = () => {
 
         </Box>
         <Box display="flex" justifyContent="center">
+          <Button
+            style={{ margin: 8 }} variant="contained" color="primary"
+            onClick={()=>                
+              shell.openExternal("https://www.patreon.com/autosub4sub")
+          }>
+            No code? get one</Button>
           <Button type="submit" form="signin"
             startIcon={loading && <CircularProgress color="inherit" size={14} />}
             style={{ margin: 8 }} variant="contained" color="primary">
             Submit</Button>
         </Box>
         <Box display="flex" justifyContent="center">
-          <Button type="submit" form="signin"
-            style={{ margin: 8 }} variant="contained" color="grey">
+          <Button 
+            style={{ margin: 8 }} variant="contained" color="grey"
+            onClick={()=>{history.push('/view')}}
+            >
             Go Back</Button>
         </Box>
       </Paper>
