@@ -92,6 +92,7 @@ const View = () => {
 
   const autoWatch = (userToWatch) => {
 
+    // const VIDEO_DURATION = 2000
     const VIDEO_DURATION = 6000 * Math.floor(Math.random() * (55 - 25) + 25)
 
     console.log(userToWatch)
@@ -105,7 +106,6 @@ const View = () => {
       //TODO. choose video
       //ToDo. exclude played video. store uid in played list. check b4 playing?
 
-      db.ref('users/' + user.uid + '/played/' + userToWatch.uid).update({ uid: userToWatch.uid })
       
       // play random video
       let videos = [userToWatch.videoUrl1]
@@ -122,9 +122,15 @@ const View = () => {
       await delay(VIDEO_DURATION) // video play time TODO. set 4mins
 
       setUrlToPlay(userToWatch.channelUrl) //subscribe channel
-      if (userToWatch.uid !== user.uid) {
+      console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+      let playedUsersKeys = await db.ref('users/' + user.uid + "/played").once('value').then((snapshot) => snapshot.val())
+      playedUsersKeys = playedUsersKeys && Object.keys(playedUsersKeys)
+      console.log(playedUsersKeys)
+      console.log(playedUsersKeys && playedUsersKeys[0] && playedUsersKeys.indexOf(userToWatch.uid))
+      if (userToWatch.uid !== user.uid && playedUsersKeys && playedUsersKeys[0] && playedUsersKeys.indexOf(userToWatch.uid) === -1 ) {
         db.ref('users/' + userToWatch.uid).update({ views: firebase.database.ServerValue.increment(1) })
       }
+      db.ref('users/' + user.uid + '/played/' + userToWatch.uid).update({ uid: userToWatch.uid })
 
       setSubing(true) //change sub text
       setCounter(8000) //subscribe channel time 8sec
