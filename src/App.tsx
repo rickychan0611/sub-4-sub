@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import View from "./pages/View";
 import Register from "./pages/Register";
 import Activate from "./pages/Activate";
+import Edit from "./pages/Edit";
 
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
         <Route exact path="/register" component={Register} />
         <Route exact path="/view" component={View} />
         <Route exact path="/activate" component={Activate} />
+        <Route exact path="/edit" component={Edit} />
       </Switch>
       </ContextProvider>
     </Router>

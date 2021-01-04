@@ -106,7 +106,19 @@ const View = () => {
       //ToDo. exclude played video. store uid in played list. check b4 playing?
 
       db.ref('users/' + user.uid + '/played/' + userToWatch.uid).update({ uid: userToWatch.uid })
-      setUrlToPlay(userToWatch.videoUrl1) //play video
+      
+      // play random video
+      let videos = [userToWatch.videoUrl1]
+      if (userToWatch.videoUrl2) {
+        videos.push(userToWatch.videoUrl2)
+      }
+      if (userToWatch.videoUrl3) {
+        videos.push(userToWatch.videoUrl3)
+      }
+      let ranNum = Math.floor(Math.random() * videos.length)
+      
+      setUrlToPlay(videos[ranNum]) //play video
+      
       await delay(VIDEO_DURATION) // video play time TODO. set 4mins
 
       setUrlToPlay(userToWatch.channelUrl) //subscribe channel
@@ -363,7 +375,7 @@ const View = () => {
           user.level === 0 && user.views >= 100 && 
           <div style={{ color: "grey", marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 20, fontWeight: "bold" }} >
 
-            <img src={congrat} style={{ width: "80%", height: "auto" }} /><br />
+            <img src={congrat} style={{ width: "80%", height: "auto", maxWidth: 500 }} /><br />
                 YEAH! You have reached 100 subscribers!<br /> <br />
                  However, the free trial is now over.<br /> <br />
             <br /> <br />
@@ -385,7 +397,7 @@ const View = () => {
           user.level === 1 && user.views >= 500 && 
           <div style={{ color: "grey", marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 20, fontWeight: "bold" }} >
 
-            <img src={congrat} style={{ width: "80%", height: "auto" }} /><br />
+            <img src={congrat} style={{ width: "80%", height: "auto", maxWidth: 500 }} /><br />
                 YEAH! You have reached 500 subscribers!<br /> <br />
             <br /> <br />
             You have reached your limit.<br /> <br />
@@ -444,7 +456,7 @@ const View = () => {
     </Grid>
 
     <Grid item xs={2}>
-      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, minHeight: 590, }}>
+      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, minHeight: 550, }}>
         <h4 style={{ textAlign: "center" }}>
           Online Buddies({onlineUsers.length})
 
@@ -469,6 +481,12 @@ const View = () => {
       </Paper>
     <Box display="flex" justifyContent="center">
         <Button style={{ width: "100%" }} variant="contained" color="primary"
+          onClick={() => {
+            history.push('/edit')
+          }}>Edit Profile</Button><br />
+      </Box>
+    <Box display="flex" justifyContent="center">
+        <Button style={{ width: "100%" , marginTop: 10 }} variant="contained" color="primary"
           onClick={() => {
             auth.signOut().then(function () {
               // Sign-out successful.

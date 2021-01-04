@@ -43,7 +43,6 @@ const ContextProvider = ({ children }) => {
               onlineUsersRef.onDisconnect().remove();
             }
           });
-
           history.push('/view')
         })
       }
