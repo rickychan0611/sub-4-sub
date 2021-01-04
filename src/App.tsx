@@ -5,6 +5,7 @@ import ContextProvider from "./context/Context"
 import Home from "./pages/Home";
 import View from "./pages/View";
 import Register from "./pages/Register";
+import Activate from "./pages/Activate";
 
 
 export default function App() {
@@ -16,6 +17,7 @@ export default function App() {
         <Route exact path="/home" component={Home} />
         <Route exact path="/register" component={Register} />
         <Route exact path="/view" component={View} />
+        <Route exact path="/activate" component={Activate} />
       </Switch>
       </ContextProvider>
     </Router>

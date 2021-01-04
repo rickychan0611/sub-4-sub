@@ -1,6 +1,7 @@
 {
   "name": "youtube-auto-sub-4-sub",
   "productName": "Youtube Auto Sub-4-Sub",
+  "version": "2.0.1",
   "description": "Automatically play online buddies Youtube videos and subscribe to their channels.",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
@@ -39,8 +40,7 @@
       "gatekeeperAssess": false
     },
     "dmg": {
-      "contents": [
-        {
+      "contents": [{
           "x": 130,
           "y": 220
         },
@@ -76,11 +76,9 @@
   "author": {
     "name": "Ricky"
   },
-  "contributors": [
-    {
-      "name": "Ricky"
-    }
-  ],
+  "contributors": [{
+    "name": "Ricky"
+  }],
   "license": "MIT",
   "keywords": [
     "electron",

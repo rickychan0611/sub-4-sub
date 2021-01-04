@@ -59,7 +59,6 @@ const Register = () => {
       setUserInfo(prev => ({ ...prev, "channelUrl": value + "?sub_confirmation=1" }))
     }
     else setUserInfo(prev => ({ ...prev, [name]: value }))
-    console.log(userInfo)
   }
 
   const onSubmit = () => {
@@ -109,8 +108,7 @@ const Register = () => {
       setLoading(true)
       auth.createUserWithEmailAndPassword(userInfo.email, userInfo.password)
         .then((doc) => {
-          console.log(doc.user.uid)
-          db.ref('users/' + doc.user.uid).update({ uid: doc.user.uid, ...userInfo })
+          db.ref('users/' + doc.user.uid).update({ level: 0, uid: doc.user.uid, ...userInfo })
             .then(() => {
               console.log("Done")
               setLoading(false)

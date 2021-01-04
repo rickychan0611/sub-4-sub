@@ -41,8 +41,6 @@ else {
 
 }
 
-console.log(preload)
-
 var ipcMain = require("electron").remote.ipcMain;
 const { shell } = require('electron');
 
@@ -74,13 +72,11 @@ const View = () => {
   ipcMain.on('subscribed', function (event, value) {
     if (value === "subscribed") {
       setSubscribed(true)
-      console.log("ipc subscribed done")
     }
   });
 
   const stopWatch = () => {
     setCounter(prev => {
-      // console.log(prev - 1000)
       return prev - 1000
     })
   }
@@ -98,7 +94,6 @@ const View = () => {
 
     const VIDEO_DURATION = 6000 * Math.floor(Math.random() * (55 - 25) + 25)
 
-    console.log("autoWatch now, run promise")
     console.log(userToWatch)
     return new Promise(async (resolve, reject) => {
       setSubscribed(false)
@@ -123,16 +118,13 @@ const View = () => {
       setCounter(8000) //subscribe channel time 8sec
       await delay(8000)
 
-      console.log("Done!!!!!!!!!! autoWatch")
       resolve()
     })
   }
 
   const repeatPlaying = async () => {
-    console.log("again")
     SetInterval.clear('stopWatch')
     setCounter(0)
-    console.log("start repeating")
     await delay(2000)
     console.log("repeating now")
     startPlaying(user.views)
@@ -171,12 +163,8 @@ const View = () => {
       onlineUsers = [...onlineUsers, ...tempArr]
     })
 
- console.log("onlineUsers", onlineUsers)
-
     let playedUsers = await db.ref('users/' + user.uid + "/played").once('value').then((snapshot) => snapshot.val())
     playedUsers = playedUsers && Object.values(playedUsers)
-
-    console.log("playedUsers", playedUsers)
 
     let random = 0;
     let check = true
@@ -235,7 +223,6 @@ const View = () => {
   useEffect(() => {
     if (attached) {
       setSubscribed(false)
-      // console.log(view)
       view.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.130 Safari/537.36 Edg/78.0.100.0")
       console.log(view.getUserAgent())
     }
@@ -244,7 +231,6 @@ const View = () => {
   let myviews;
   // stop all played
   useEffect(() => {
-    console.log("userEffect", user.views)
     myviews = user.views
   }, [user.views])
 
@@ -279,7 +265,7 @@ const View = () => {
 
   return (
 
-    <div style={{ padding: 50, paddingTop: 0, overflow: "auto" }}>
+    <div style={{ padding: 50, paddingTop: 0, overflow: "auto"}}>
       {/* {JSON.stringify(filteredUsers.map(item => item.uid))}<br /> */}
       {/* <Button variant="contained" color="primary" onClick={() => setDevTools(!devTools)}>Toggle DevTools</Button><br />
       <Button variant="contained" color="primary" onClick={() => switchURL()}>Switch URL</Button><br />
@@ -293,8 +279,10 @@ const View = () => {
         subscribers and counting!</span>
         </Box>
 
-        {/* //FREE */}
-        {user.views < (admin.v0_1_0 ? admin.v0_1_0.maxViews : 0) && <>
+        {/* //free verison 100, pro veriosn 500 (need to set code more places find them)*/}
+        {(!(user.level === 0 && user.views >= 100) || !(user.level === 1 && user.views >= 500))  && 
+        
+        <>
 
           {youtubeLogedIn ?
             // {/* {true ? */ }
@@ -316,7 +304,9 @@ const View = () => {
           </Button>
           </Box>
         </>
-                :
+
+        :
+        
       <>
         <Box style={{ color: "grey" }}>
           {subing ? "Subscribing " : "Next Video in "} {timer(counter)}
@@ -365,8 +355,12 @@ const View = () => {
         minHeight: 670, margin: 10, marginTop: 0, paddingTop: 35, padding: 15, marginBottom: 20,
       }}>
 
-        {/* //FREE */}
-        {user.views >= (admin.v0_1_0 ? admin.v0_1_0.maxViews : 0) ?
+        {/* //free verison 100, pro veriosn 500 (need to set code more places find them)*/}
+        {(user.level === 0 && user.views >= 100) || (user.level === 1 && user.views >= 500) ?
+          <>
+
+          {////when level 0 version greter than 100 views--->start
+          user.level === 0 && user.views >= 100 && 
           <div style={{ color: "grey", marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 20, fontWeight: "bold" }} >
 
             <img src={congrat} style={{ width: "80%", height: "auto" }} /><br />
@@ -378,12 +372,42 @@ const View = () => {
               style={{ color: "#7aa7f0", cursor: "pointer" }}
               onClick={(event) => {
                 event.preventDefault();
-                shell.openExternal("https://www.facebook.com");
+                shell.openExternal("https://www.patreon.com/autosub4sub");
               }}
             >
-              download the full version.😄😎
-                  </span>
-          </div> :
+              click to activate full version.😄😎
+              </span>
+          </div> 
+          //when level 0 version greter than 100 views--->end
+          }
+
+          {//when level 1 version greter than 500 views--->start
+          user.level === 1 && user.views >= 500 && 
+          <div style={{ color: "grey", marginLeft: 8, marginBottom: 40, textAlign: 'center', fontSize: 20, fontWeight: "bold" }} >
+
+            <img src={congrat} style={{ width: "80%", height: "auto" }} /><br />
+                YEAH! You have reached 500 subscribers!<br /> <br />
+            <br /> <br />
+            You have reached your limit.<br /> <br />
+            To get unlimited subscribers, activate the VIP or KING version <br /> <br />
+            <span
+              style={{ color: "#7aa7f0", cursor: "pointer" }}
+              onClick={(event) => {
+                event.preventDefault();
+                shell.openExternal("https://www.patreon.com/autosub4sub");
+              }}
+            >
+              👑💎Upgrade my membership now.💎👑
+              </span>
+          </div> 
+          //when level 0 version greter than 100 views--->end
+          }
+
+          
+          </>
+          
+          :
+
           <>
             {toggleView && win &&
               <BrowserView
@@ -415,20 +439,24 @@ const View = () => {
                 enableRemoteModule={true}
               />
             }
-          </>}
+        </>}
       </Paper>
     </Grid>
 
     <Grid item xs={2}>
-      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, marginRight: 10, minHeight: 620, }}>
+      <Paper elevation={3} style={{ paddingTop: 5, marginBottom: 20, minHeight: 590, }}>
         <h4 style={{ textAlign: "center" }}>
           Online Buddies({onlineUsers.length})
-              <div style={{ fontSize: 12, marginTop: 10 }}>
+
+          {admin.v0_1_0.showLevel && <>
+           <div style={{ fontSize: 12, marginTop: 10, marginBottom: 10 }}>
             🙂=Free <br />
               ⭐️=Pro<br />
               💎=VIP<br />
               👑=KING<br />
           </div>
+        </>}
+        
         </h4>
         <Divider />
         <List component="nav" style={{ padding: 10 }}>
@@ -439,8 +467,8 @@ const View = () => {
           })}
         </List>
       </Paper>
-    <Box display="flex" justifyContent="flex-end">
-        <Button style={{ margin: 8 }} variant="contained" color="primary"
+    <Box display="flex" justifyContent="center">
+        <Button style={{ width: "100%" }} variant="contained" color="primary"
           onClick={() => {
             auth.signOut().then(function () {
               // Sign-out successful.
@@ -449,6 +477,12 @@ const View = () => {
               // An error happened.
             });
           }}>Sign Out</Button><br />
+      </Box>
+    <Box display="flex" justifyContent="center">
+        <Button style={{ width: "100%", marginTop: 10 }} variant="contained" color="primary"
+          onClick={() => {
+            history.push('/activate')
+          }}>Activation</Button><br />
       </Box>
     </Grid>
   </Grid>
